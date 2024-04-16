@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { GoogleAdsApi } from "google-ads-api";
-import {twelveMonthsAgo, twentyEightDaysAgo, today} from './dates.js';
+import {twelveMonthsAgo, thirtyDaysAgo, today} from './dates.js';
 import { enums } from "google-ads-api";
 
 const client = new GoogleAdsApi({
@@ -17,24 +17,28 @@ const customer = client.Customer({
   });
 
 
-const clicks = await customer.report({
-  entity: "campaign",
-  attributes: [
-    "campaign.id",
-    "campaign.name",
-    "campaign.bidding_strategy_type",
-    "campaign_budget.amount_micros",
-  ],
-  metrics: [
-    "metrics.cost_micros",
-    "metrics.clicks",
-    "metrics.impressions",
-    "metrics.all_conversions",
-  ],
-  constraints: {
-    "campaign.status": enums.CampaignStatus.ENABLED,
-  },
-  limit: 20,
-});
+const getClicks = async (startDate, endDate) => {
 
-export {clicks};
+  const [summaryRow, ...response] = await customer.report({
+    entity: "campaign",
+    metrics: ["metrics.clicks"],
+    summary_row_setting: enums.SummaryRowSetting.SUMMARY_ROW_WITH_RESULTS,
+    segments: ["segments.date"],
+    from_date: startDate,
+    to_date: endDate,    
+  });
+
+  return summaryRow.metrics.clicks;
+
+}
+
+async function gadClicks() {
+  const getLastYear = await getClicks(twelveMonthsAgo, today);
+  const getLast30Days = await getClicks(thirtyDaysAgo, today);
+  return {
+    lastYear: getLastYear, 
+    last30Days: getLast30Days
+  };
+}
+
+export {gadClicks};
