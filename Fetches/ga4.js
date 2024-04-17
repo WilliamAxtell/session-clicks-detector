@@ -1,14 +1,12 @@
 import {BetaAnalyticsDataClient} from '@google-analytics/data';
 import {twelveMonthsAgo, thirtyDaysAgo, today} from './dates.js';
 
-//const propertyId = '314616216';
-const sessionData = {};
-
 const analyticsDataClient = new BetaAnalyticsDataClient({keyFilename: './credentials.json'}
 );
 
 // Runs a simple report.
 async function runReport(propertyId) {
+  const sessionData = {};
   const [response] = await analyticsDataClient.runReport({
     property: `properties/${propertyId}`,
     dateRanges: [
