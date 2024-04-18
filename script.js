@@ -20,14 +20,19 @@ const clients = {
 
 
 const techCheck = async (client, ga4Prop, gadsCust) => {
-    //Collects 30 day and 12 month session data from GA4 and 30 day and 12 month campaign click data from Google Ads
-    const GA4 = await runReport(ga4Prop);
-    const GAds = await gadClicks(gadsCust);
-    // const GA4 = { lastYear: 17864, last30Days: 1509 };
-    // const GAds = { lastYear: 44726, last30Days: 4940 };
-    console.log(client);
-    console.log(GA4);
-    console.log(GAds);
+    try {
+        //Collects 30 day and 12 month session data from GA4 and 30 day and 12 month campaign click data from Google Ads
+        const GA4 = await runReport(ga4Prop);
+        const GAds = await gadClicks(gadsCust);
+        // const GA4 = { lastYear: 17864, last30Days: 1509 };
+        // const GAds = { lastYear: 44726, last30Days: 4940 };
+        // console.log(client);
+        // console.log(GA4);
+        // console.log(GAds);
+    } catch (error) {
+        console.error(`Data collection error for ${client}, ${error}`);
+        return;
+    }
 
     //Calculates the ratio for GA4 sessions and Google Ads clicks for the last 30 days and last 12 months
     const yearPerc = Math.round((GA4.lastYear / GAds.lastYear) * 100);
@@ -44,15 +49,19 @@ const techCheck = async (client, ga4Prop, gadsCust) => {
     }
 }
 
-for (const client in clients) {
-    const ga4Prop = clients[client].propertyId;
-    const gadsCust = clients[client].customer_id;
-    techCheck(client, ga4Prop, gadsCust);
-}
+// for (const client in clients) {
+//     const ga4Prop = clients[client].propertyId;
+//     const gadsCust = clients[client].customer_id;
+//     techCheck(client, ga4Prop, gadsCust);
+// }
 
 //console.log("scheduler running");
 
 // const j = schedule.scheduleJob({hour: 6, minute: 0, date: 1}, () => {
-//   console.log("job scheduled");
-//   techCheck();
+    // console.log("job scheduled");
+    // for (const client in clients) {
+    //     const ga4Prop = clients[client].propertyId;
+    //     const gadsCust = clients[client].customer_id;
+    //     techCheck(client, ga4Prop, gadsCust);
+    // }
 // });
